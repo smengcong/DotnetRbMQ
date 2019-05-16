@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MQReceive
@@ -38,12 +39,16 @@ namespace MQReceive
             {
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body);
+                Thread.Sleep(2000);
                 Console.WriteLine(message + "已接收");
                 WriteLog(message);
+                //手动应答 需要确认消息
+                _channel.BasicAck(ea.DeliveryTag, false);
             };
             _channel.BasicConsume(queue: _QueueName,
-                                 autoAck: true,
+                                 autoAck: false,//自动应答
                                  consumer: consumer);
+
         }
 
         public void Stop()
